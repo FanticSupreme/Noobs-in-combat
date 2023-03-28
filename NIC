@@ -1,0 +1,51 @@
+local workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+while wait(5) do
+    -- Delete the "THex" folder if it already exists
+    local folder = workspace:FindFirstChild("THex")
+    if folder then
+        folder:Destroy()
+    end
+
+    -- Create a new "THex" folder to hold the new parts
+    folder = Instance.new("Folder")
+    folder.Name = "THex"
+    folder.Parent = workspace
+
+    -- Loop through the soldiers and vehicles and create new parts for each one
+    for i,v in pairs(ReplicatedStorage["HIDDEN_UNITS"]:GetDescendants()) do
+        local partName = v.Name:lower()
+        local isVehicle = (partName:find("chassis") or partName:find("!tracks") or partName:find("turret"))
+
+        if isVehicle then
+            -- Create a part for the vehicle
+            local vehicle = v.Parent.PrimaryPart
+            if not vehicle then
+                print("Warning: Vehicle part does not have a PrimaryPart property.")
+                continue
+            end
+
+            local part = Instance.new("Part")
+            part.Name = "Vehicle"
+            part.Color = Color3.new(0.5, 0.5, 0.5) -- Set the color to grey for vehicles
+            part.Transparency = 0.5 -- Make the part semi-transparent so it doesn't block the view
+            part.Size = Vector3.new(1, 3, 1) -- Set the size of the part
+            part.CFrame = vehicle.CFrame
+            part.Anchored = true -- Anchor the part
+            part.Parent = folder
+
+        elseif partName == "!humans" then
+            -- Create a part for the human soldier
+            local soldiers = v.Parent.Hitbox
+            local part = Instance.new("Part")
+            part.Name = "Soldier"
+            part.Color = Color3.new(0, 1, 0) -- Set the color to green for humans
+            part.Transparency = 0.5 -- Make the part semi-transparent so it doesn't block the view
+            part.Size = Vector3.new(1, 3, 1) -- Set the size of the part
+            part.CFrame = CFrame.new(soldiers.Position)
+            part.Anchored = true -- Anchor the part
+            part.Parent = folder
+        end
+    end
+end
